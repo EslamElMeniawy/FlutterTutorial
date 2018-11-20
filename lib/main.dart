@@ -17,9 +17,7 @@ class MyApp extends StatelessWidget {
           title: Text('Easy List'),
           centerTitle: true,
         ),
-        body: ProductsManager(
-          startingProduct: 'Food Tester',
-        ),
+        body: ProductsManager(),
       ),
     );
   }
