@@ -46,22 +46,26 @@ class ProductPage extends StatelessWidget {
           title: Text(title),
           centerTitle: true,
         ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        body: ListView(
           children: <Widget>[
-            Image.asset(imageUrl),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: Text(title),
-            ),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: RaisedButton(
-                color: Theme.of(context).accentColor,
-                textColor: Colors.white,
-                child: Text('DELETE'),
-                onPressed: () => _showDeleteDialog(context),
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Image.asset(imageUrl),
+                Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(title),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: RaisedButton(
+                    color: Theme.of(context).accentColor,
+                    textColor: Colors.white,
+                    child: Text('DELETE'),
+                    onPressed: () => _showDeleteDialog(context),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
