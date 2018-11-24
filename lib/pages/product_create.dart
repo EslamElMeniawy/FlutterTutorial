@@ -68,7 +68,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
               };
 
               widget.addProduct(product);
-              Navigator.pushReplacementNamed(context, '/');
+              Navigator.pushReplacementNamed(context, '/products');
             },
             child: Text('Save'),
             color: Theme.of(context).primaryColor,
