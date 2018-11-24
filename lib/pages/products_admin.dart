@@ -34,6 +34,7 @@ class ProductsAdminPage extends StatelessWidget {
           title: Text('Manage Products'),
           centerTitle: true,
           bottom: TabBar(
+            indicatorColor: Colors.white,
             tabs: <Widget>[
               Tab(
                 icon: Icon(Icons.create),
