@@ -29,7 +29,7 @@ class Products extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 6.0,
-                    vertical: 2.5,
+                    vertical: 3.0,
                   ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).accentColor,
@@ -41,6 +41,19 @@ class Products extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.grey,
+                width: 1.0,
+              ),
+              borderRadius: BorderRadius.circular(5.0),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 3.0),
+              child: Text('Mansoura, Egypt'),
             ),
           ),
           ButtonBar(
