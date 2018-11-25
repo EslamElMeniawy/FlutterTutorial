@@ -15,12 +15,17 @@ class Products extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  products[index]['title'],
-                  style: TextStyle(
-                    fontSize: 26.0,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Oswald',
+                SizedBox(
+                  width: 8.0,
+                ),
+                Expanded(
+                  child: Text(
+                    products[index]['title'],
+                    style: TextStyle(
+                      fontSize: 26.0,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Oswald',
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -39,6 +44,9 @@ class Products extends StatelessWidget {
                     '\$${products[index]['price'].toString()}',
                     style: TextStyle(color: Colors.white),
                   ),
+                ),
+                SizedBox(
+                  width: 8.0,
                 ),
               ],
             ),
