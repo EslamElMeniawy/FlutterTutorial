@@ -15,13 +15,14 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   String _titleValue;
   String _descriptionValue;
   double _priceValue;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Widget _buildTitleTextField() {
-    return TextField(
+    return TextFormField(
       decoration: InputDecoration(
         labelText: 'Product Title',
       ),
-      onChanged: (String value) {
+      onSaved: (String value) {
         setState(() {
           _titleValue = value;
         });
@@ -30,13 +31,13 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   }
 
   Widget _buildDescriptionTextField() {
-    return TextField(
+    return TextFormField(
       maxLines: 4,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
         labelText: 'Product Description',
       ),
-      onChanged: (String value) {
+      onSaved: (String value) {
         setState(() {
           _descriptionValue = value;
         });
@@ -45,12 +46,12 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   }
 
   Widget _buildPriceTextField() {
-    return TextField(
+    return TextFormField(
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
         labelText: 'Product Price',
       ),
-      onChanged: (String value) {
+      onSaved: (String value) {
         setState(() {
           _priceValue = double.parse(value);
         });
@@ -59,6 +60,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   }
 
   void _submitForm() {
+    _formKey.currentState.save();
+
     final Map<String, dynamic> product = {
       'title': _titleValue,
       'description': _descriptionValue,
@@ -78,22 +81,25 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
 
     return Container(
       margin: EdgeInsets.all(10.0),
-      child: ListView(
-        padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
-        children: <Widget>[
-          _buildTitleTextField(),
-          _buildDescriptionTextField(),
-          _buildPriceTextField(),
-          SizedBox(
-            height: 10.0,
-          ),
-          RaisedButton(
-            onPressed: _submitForm,
-            child: Text('Save'),
-            color: Theme.of(context).primaryColor,
-            textColor: Colors.white,
-          )
-        ],
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
+          children: <Widget>[
+            _buildTitleTextField(),
+            _buildDescriptionTextField(),
+            _buildPriceTextField(),
+            SizedBox(
+              height: 10.0,
+            ),
+            RaisedButton(
+              onPressed: _submitForm,
+              child: Text('Save'),
+              color: Theme.of(context).primaryColor,
+              textColor: Colors.white,
+            )
+          ],
+        ),
       ),
     );
   }
