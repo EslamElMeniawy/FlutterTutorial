@@ -30,7 +30,7 @@ class ProductListPage extends StatelessWidget {
       builder: (BuildContext context, Widget child, MainModel model) {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
-            final Product product = model.products[index];
+            final Product product = model.allProducts[index];
 
             return Dismissible(
               key: Key(product.title),
@@ -58,7 +58,7 @@ class ProductListPage extends StatelessWidget {
               ),
             );
           },
-          itemCount: model.products.length,
+          itemCount: model.allProducts.length,
         );
       },
     );

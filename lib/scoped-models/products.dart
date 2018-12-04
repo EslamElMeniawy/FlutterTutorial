@@ -1,56 +1,58 @@
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
+import './connected_product.dart';
 
-class ProductsModel extends Model {
-  List<Product> _products = [];
-  int _selectedProductIndex;
+class ProductsModel extends ConnectedProduct {
   bool _showFavorite = false;
 
-  List<Product> get products {
-    return List.from(_products);
+  List<Product> get allProducts {
+    return List.from(products);
   }
 
   List<Product> get displayedProducts {
     if (_showFavorite) {
       return List.from(
-          _products.where((Product product) => product.isFavorite).toList());
+          products.where((Product product) => product.isFavorite).toList());
     }
 
-    return List.from(_products);
+    return List.from(products);
   }
 
   int get selectedProductIndex {
-    return _selectedProductIndex;
+    return selProductIndex;
   }
 
   Product get selectedProduct {
-    if (_selectedProductIndex == null) {
+    if (selProductIndex == null) {
       return null;
     }
 
-    return _products[_selectedProductIndex];
+    return products[selProductIndex];
   }
 
   bool get displayFavoriteOnly {
     return _showFavorite;
   }
 
-  void addProduct(Product product) {
-    _products.add(product);
-    _selectedProductIndex = null;
-    notifyListeners();
-  }
+  void updateProduct(
+      String title, String description, double price, String image) {
+    final Product updatedProduct = Product(
+        title: title,
+        description: description,
+        price: price,
+        image: image,
+        userEmail: selectedProduct.userEmail,
+        userId: selectedProduct.userId);
 
-  void updateProduct(Product product) {
-    _products[_selectedProductIndex] = product;
-    _selectedProductIndex = null;
+    products[selProductIndex] = updatedProduct;
+    selProductIndex = null;
     notifyListeners();
   }
 
   void deleteProduct() {
-    _products.removeAt(_selectedProductIndex);
-    _selectedProductIndex = null;
+    products.removeAt(selProductIndex);
+    selProductIndex = null;
     notifyListeners();
   }
 
@@ -60,13 +62,17 @@ class ProductsModel extends Model {
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        userEmail: selectedProduct.userEmail,
+        userId: selectedProduct.userId,
         isFavorite: !selectedProduct.isFavorite);
 
-    updateProduct(updatedProduct);
+    products[selProductIndex] = updatedProduct;
+    selProductIndex = null;
+    notifyListeners();
   }
 
   void selectProduct(int index) {
-    _selectedProductIndex = index;
+    selProductIndex = index;
     notifyListeners();
   }
 

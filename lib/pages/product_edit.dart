@@ -143,18 +143,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
       _formKey.currentState.save();
 
       if (selectedProductIndex == null) {
-        addProduct(Product(
-            title: _formData['title'],
-            description: _formData['description'],
-            price: _formData['price'],
-            image: _formData['image']));
+        addProduct(_formData['title'], _formData['description'],
+            _formData['price'], _formData['image']);
       } else {
-        updateProduct(
-            Product(
-                title: _formData['title'],
-                description: _formData['description'],
-                price: _formData['price'],
-                image: _formData['image']));
+        updateProduct(_formData['title'], _formData['description'],
+            _formData['price'], _formData['image']);
       }
 
       Navigator.pushReplacementNamed(context, '/products');
