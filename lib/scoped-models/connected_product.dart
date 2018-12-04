@@ -21,21 +21,26 @@ class ConnectedProductModel extends Model {
           'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg'
     };
 
-    http.post(
+    http
+        .post(
       'https://auth-95faf.firebaseio.com/products.json',
       body: json.encode(productData),
-    );
+    )
+        .then((http.Response response) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
 
-    final Product newProduct = Product(
-        title: title,
-        description: description,
-        price: price,
-        image: image,
-        userEmail: _authenticatedUser.email,
-        userId: _authenticatedUser.id);
+      final Product newProduct = Product(
+          id: responseData['name'],
+          title: title,
+          description: description,
+          price: price,
+          image: image,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id);
 
-    _products.add(newProduct);
-    notifyListeners();
+      _products.add(newProduct);
+      notifyListeners();
+    });
   }
 }
 
