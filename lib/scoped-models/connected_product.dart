@@ -10,9 +10,12 @@ class ConnectedProductModel extends Model {
   List<Product> _products = [];
   User _authenticatedUser;
   int _selectedProductIndex;
+  bool _isLoading = false;
 
   void addProduct(
       String title, String description, double price, String image) {
+    _isLoading = true;
+
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
@@ -39,6 +42,7 @@ class ConnectedProductModel extends Model {
           userId: _authenticatedUser.id);
 
       _products.add(newProduct);
+      _isLoading = false;
       notifyListeners();
     });
   }
@@ -79,6 +83,7 @@ class ProductsModel extends ConnectedProductModel {
   void updateProduct(
       String title, String description, double price, String image) {
     final Product updatedProduct = Product(
+        id: selectedProduct.id,
         title: title,
         description: description,
         price: price,
@@ -96,6 +101,8 @@ class ProductsModel extends ConnectedProductModel {
   }
 
   void fetchProducts() {
+    _isLoading = true;
+
     http
         .get('https://auth-95faf.firebaseio.com/products.json')
         .then((http.Response response) {
@@ -117,12 +124,14 @@ class ProductsModel extends ConnectedProductModel {
       });
 
       _products = fetchedProductList;
+      _isLoading = false;
       notifyListeners();
     });
   }
 
   void toggleProductFavoriteStatus() {
     final Product updatedProduct = Product(
+        id: selectedProduct.id,
         title: selectedProduct.title,
         description: selectedProduct.description,
         price: selectedProduct.price,
@@ -152,5 +161,11 @@ class ProductsModel extends ConnectedProductModel {
 class UserModel extends ConnectedProductModel {
   void login(String email, String password) {
     _authenticatedUser = User(id: 'userid', email: email, password: password);
+  }
+}
+
+class UtilityModel extends ConnectedProductModel {
+  bool get isLoading {
+    return _isLoading;
   }
 }
