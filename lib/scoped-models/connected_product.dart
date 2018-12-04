@@ -18,14 +18,14 @@ class ConnectedProductModel extends Model {
       'description': description,
       'price': price,
       'image':
-          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg'
+          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
     };
 
     http
-        .post(
-      'https://auth-95faf.firebaseio.com/products.json',
-      body: json.encode(productData),
-    )
+        .post('https://auth-95faf.firebaseio.com/products.json',
+            body: json.encode(productData))
         .then((http.Response response) {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
@@ -93,6 +93,32 @@ class ProductsModel extends ConnectedProductModel {
   void deleteProduct() {
     _products.removeAt(_selectedProductIndex);
     notifyListeners();
+  }
+
+  void fetchProducts() {
+    http
+        .get('https://auth-95faf.firebaseio.com/products.json')
+        .then((http.Response response) {
+      final List<Product> fetchedProductList = [];
+
+      final Map<String, dynamic> productListData = json.decode(response.body);
+
+      productListData.forEach((String productId, dynamic productData) {
+        final Product product = Product(
+            id: productId,
+            title: productData['title'],
+            description: productData['description'],
+            price: productData['price'],
+            image: productData['image'],
+            userEmail: productData['userEmail'],
+            userId: productData['userId']);
+
+        fetchedProductList.add(product);
+      });
+
+      _products = fetchedProductList;
+      notifyListeners();
+    });
   }
 
   void toggleProductFavoriteStatus() {
