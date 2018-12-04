@@ -109,29 +109,32 @@ class _AuthPageState extends State<AuthPage> {
           child: SingleChildScrollView(
             child: Container(
               width: targetWidth,
-              child: Column(
-                children: <Widget>[
-                  _buildEmailTextField(),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  _buildPasswordTextField(),
-                  _buildTermsSwitch(),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  ScopedModelDescendant<MainModel>(
-                    builder:
-                        (BuildContext context, Widget child, MainModel model) {
-                      return RaisedButton(
-                        color: Theme.of(context).primaryColor,
-                        textColor: Colors.white,
-                        child: Text('LOGIN'),
-                        onPressed: () => _submitForm(model.login),
-                      );
-                    },
-                  ),
-                ],
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    _buildEmailTextField(),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    _buildPasswordTextField(),
+                    _buildTermsSwitch(),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    ScopedModelDescendant<MainModel>(
+                      builder: (BuildContext context, Widget child,
+                          MainModel model) {
+                        return RaisedButton(
+                          color: Theme.of(context).primaryColor,
+                          textColor: Colors.white,
+                          child: Text('LOGIN'),
+                          onPressed: () => _submitForm(model.login),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
