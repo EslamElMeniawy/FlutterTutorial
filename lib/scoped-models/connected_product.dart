@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/product.dart';
 import '../models/user.dart';
@@ -10,6 +13,19 @@ class ConnectedProductModel extends Model {
 
   void addProduct(
       String title, String description, double price, String image) {
+    final Map<String, dynamic> productData = {
+      'title': title,
+      'description': description,
+      'price': price,
+      'image':
+          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg'
+    };
+
+    http.post(
+      'https://auth-95faf.firebaseio.com/products.json',
+      body: json.encode(productData),
+    );
+
     final Product newProduct = Product(
         title: title,
         description: description,
