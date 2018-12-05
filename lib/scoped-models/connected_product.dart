@@ -133,11 +133,11 @@ class ProductsModel extends ConnectedProductModel {
     });
   }
 
-  void fetchProducts() {
+  Future<Null> fetchProducts() {
     _isLoading = true;
     notifyListeners();
 
-    http
+    return http
         .get('https://auth-95faf.firebaseio.com/products.json')
         .then((http.Response response) {
       final List<Product> fetchedProductList = [];

@@ -57,7 +57,10 @@ class _ProductPageState extends State<ProductsPage> {
           );
         }
 
-        return content;
+        return RefreshIndicator(
+          child: content,
+          onRefresh: model.fetchProducts,
+        );
       },
     );
   }
