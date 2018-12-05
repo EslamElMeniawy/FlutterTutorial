@@ -12,54 +12,6 @@ class ConnectedProductModel extends Model {
   User _authenticatedUser;
   String _selectedProductId;
   bool _isLoading = false;
-
-  Future<bool> addProduct(
-      String title, String description, double price, String image) async {
-    _isLoading = true;
-    notifyListeners();
-
-    final Map<String, dynamic> productData = {
-      'title': title,
-      'description': description,
-      'price': price,
-      'image':
-          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
-      'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
-    };
-
-    try {
-      final http.Response response = await http.post(
-          'https://auth-95faf.firebaseio.com/products.json',
-          body: json.encode(productData));
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-
-      final Map<String, dynamic> responseData = json.decode(response.body);
-
-      final Product newProduct = Product(
-          id: responseData['name'],
-          title: title,
-          description: description,
-          price: price,
-          image: image,
-          userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id);
-
-      _products.add(newProduct);
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (error) {
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
 }
 
 class ProductsModel extends ConnectedProductModel {
@@ -100,6 +52,54 @@ class ProductsModel extends ConnectedProductModel {
 
   bool get displayFavoriteOnly {
     return _showFavorite;
+  }
+
+  Future<bool> addProduct(
+      String title, String description, double price, String image) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final Map<String, dynamic> productData = {
+      'title': title,
+      'description': description,
+      'price': price,
+      'image':
+      'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
+    };
+
+    try {
+      final http.Response response = await http.post(
+          'https://auth-95faf.firebaseio.com/products.json',
+          body: json.encode(productData));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      final Product newProduct = Product(
+          id: responseData['name'],
+          title: title,
+          description: description,
+          price: price,
+          image: image,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id);
+
+      _products.add(newProduct);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> updateProduct(
