@@ -64,7 +64,7 @@ class ProductsModel extends ConnectedProductModel {
       'description': description,
       'price': price,
       'image':
-      'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
+          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id
     };
@@ -249,6 +249,47 @@ class ProductsModel extends ConnectedProductModel {
 class UserModel extends ConnectedProductModel {
   void login(String email, String password) {
     _authenticatedUser = User(id: 'userid', email: email, password: password);
+  }
+
+  Future<Map<String, dynamic>> signUp(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final Map<String, dynamic> authData = {
+      'email': email,
+      'password': password,
+      'returnSecureToken': true,
+    };
+
+    try {
+      final http.Response response = await http.post(
+        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBe74nyu2lz-9o1H0_CnHmHd0kCOczd_nw',
+        body: json.encode(authData),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      bool success = true;
+      String message = 'Authentication succeeded.';
+
+      if (responseData.containsKey('error')) {
+        success = false;
+
+        if (responseData['error']['message'] == 'EMAIL_EXISTS') {
+          message = 'This email already exsists.';
+        } else {
+          message = 'Something went wrong.';
+        }
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return {'success': success, 'message': message};
+    } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'message': 'Something went wrong.'};
+    }
   }
 }
 
