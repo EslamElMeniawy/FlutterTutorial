@@ -117,9 +117,20 @@ class ProductsModel extends ConnectedProductModel {
     });
   }
 
-  void deleteProduct() {
+  Future<Null> deleteProduct() {
+    _isLoading = true;
+    final deletedProductId = selectedProduct.id;
     _products.removeAt(_selectedProductIndex);
+    _selectedProductIndex = null;
     notifyListeners();
+
+    return http
+        .delete(
+            'https://auth-95faf.firebaseio.com/products/$deletedProductId.json')
+        .then((http.Response response) {
+      _isLoading = false;
+      notifyListeners();
+    });
   }
 
   void fetchProducts() {
