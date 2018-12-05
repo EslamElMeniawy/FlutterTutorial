@@ -82,19 +82,39 @@ class ProductsModel extends ConnectedProductModel {
     return _showFavorite;
   }
 
-  void updateProduct(
+  Future<Null> updateProduct(
       String title, String description, double price, String image) {
-    final Product updatedProduct = Product(
-        id: selectedProduct.id,
-        title: title,
-        description: description,
-        price: price,
-        image: image,
-        userEmail: selectedProduct.userEmail,
-        userId: selectedProduct.userId);
-
-    _products[_selectedProductIndex] = updatedProduct;
+    _isLoading = true;
     notifyListeners();
+
+    final Map<String, dynamic> updatedData = {
+      'title': title,
+      'description': description,
+      'price': price,
+      'image':
+          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
+    };
+
+    return http
+        .put(
+            'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}.json',
+            body: json.encode(updatedData))
+        .then((http.Response response) {
+      final Product updatedProduct = Product(
+          id: selectedProduct.id,
+          title: title,
+          description: description,
+          price: price,
+          image: image,
+          userEmail: selectedProduct.userEmail,
+          userId: selectedProduct.userId);
+
+      _products[_selectedProductIndex] = updatedProduct;
+      _isLoading = false;
+      notifyListeners();
+    });
   }
 
   void deleteProduct() {
