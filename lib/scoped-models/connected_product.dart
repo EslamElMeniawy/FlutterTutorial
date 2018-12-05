@@ -13,7 +13,7 @@ class ConnectedProductModel extends Model {
   String _selectedProductId;
   bool _isLoading = false;
 
-  Future<Null> addProduct(
+  Future<bool> addProduct(
       String title, String description, double price, String image) {
     _isLoading = true;
     notifyListeners();
@@ -32,6 +32,12 @@ class ConnectedProductModel extends Model {
         .post('https://auth-95faf.firebaseio.com/products.json',
             body: json.encode(productData))
         .then((http.Response response) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       final Product newProduct = Product(
@@ -46,6 +52,7 @@ class ConnectedProductModel extends Model {
       _products.add(newProduct);
       _isLoading = false;
       notifyListeners();
+      return true;
     });
   }
 }
@@ -175,6 +182,7 @@ class ProductsModel extends ConnectedProductModel {
       _products = fetchedProductList;
       _isLoading = false;
       notifyListeners();
+      _selectedProductId = null;
     });
   }
 
