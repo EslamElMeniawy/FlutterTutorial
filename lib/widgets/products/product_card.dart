@@ -71,7 +71,12 @@ class ProductCard extends StatelessWidget {
     return Card(
       child: Column(
         children: <Widget>[
-          Image.network(product.image),
+          FadeInImage(
+            placeholder: AssetImage('assets/food.jpg'),
+            image: NetworkImage(product.image),
+            height: 300.0,
+            fit: BoxFit.cover,
+          ),
           _buildTitlePriceRow(),
           AddressTag('Mansoura, Egypt'),
           Text(product.userEmail),
