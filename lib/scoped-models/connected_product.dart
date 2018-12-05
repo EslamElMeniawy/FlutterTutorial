@@ -10,7 +10,7 @@ import '../models/user.dart';
 class ConnectedProductModel extends Model {
   List<Product> _products = [];
   User _authenticatedUser;
-  int _selectedProductIndex;
+  String _selectedProductId;
   bool _isLoading = false;
 
   Future<Null> addProduct(
@@ -67,15 +67,23 @@ class ProductsModel extends ConnectedProductModel {
   }
 
   int get selectedProductIndex {
-    return _selectedProductIndex;
+    return _products.indexWhere((Product product) {
+      return product.id == _selectedProductId;
+    });
+  }
+
+  String get selectedProductId {
+    return _selectedProductId;
   }
 
   Product get selectedProduct {
-    if (_selectedProductIndex == null) {
+    if (_selectedProductId == null) {
       return null;
     }
 
-    return _products[_selectedProductIndex];
+    return _products.firstWhere((Product product) {
+      return product.id == _selectedProductId;
+    });
   }
 
   bool get displayFavoriteOnly {
@@ -111,7 +119,7 @@ class ProductsModel extends ConnectedProductModel {
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId);
 
-      _products[_selectedProductIndex] = updatedProduct;
+      _products[selectedProductIndex] = updatedProduct;
       _isLoading = false;
       notifyListeners();
     });
@@ -120,8 +128,9 @@ class ProductsModel extends ConnectedProductModel {
   Future<Null> deleteProduct() {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
-    _products.removeAt(_selectedProductIndex);
-    _selectedProductIndex = null;
+
+    _products.removeAt(selectedProductIndex);
+    _selectedProductId = null;
     notifyListeners();
 
     return http
@@ -180,14 +189,14 @@ class ProductsModel extends ConnectedProductModel {
         userId: selectedProduct.userId,
         isFavorite: !selectedProduct.isFavorite);
 
-    _products[_selectedProductIndex] = updatedProduct;
+    _products[selectedProductIndex] = updatedProduct;
     notifyListeners();
   }
 
-  void selectProduct(int index) {
-    _selectedProductIndex = index;
+  void selectProduct(String productId) {
+    _selectedProductId = productId;
 
-    if (index != null) {
+    if (productId != null) {
       notifyListeners();
     }
   }

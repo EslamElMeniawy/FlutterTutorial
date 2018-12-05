@@ -105,7 +105,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                     model.addProduct,
                     model.updateProduct,
                     model.selectProduct,
-                    model.selectedProductIndex),
+                    model.selectedProductId),
                 child: Text('Save'),
                 color: Theme.of(context).primaryColor,
                 textColor: Colors.white,
@@ -146,11 +146,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   void _submitForm(
       Function addProduct, Function updateProduct, Function setSelectedProduct,
-      [int selectedProductIndex]) {
+      [String selectedProductId]) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
 
-      if (selectedProductIndex == null) {
+      if (selectedProductId == null) {
         addProduct(
           _formData['title'],
           _formData['description'],
@@ -174,7 +174,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return model.selectedProductIndex == null
+        return model.selectedProductId == null
             ? _buildPageContent(context, model.selectedProduct)
             : Scaffold(
                 appBar: AppBar(
