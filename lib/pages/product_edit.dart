@@ -96,13 +96,20 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget _buildSubmitButton() {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return RaisedButton(
-          onPressed: () => _submitForm(model.addProduct, model.updateProduct,
-              model.selectProduct, model.selectedProductIndex),
-          child: Text('Save'),
-          color: Theme.of(context).primaryColor,
-          textColor: Colors.white,
-        );
+        return model.isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : RaisedButton(
+                onPressed: () => _submitForm(
+                    model.addProduct,
+                    model.updateProduct,
+                    model.selectProduct,
+                    model.selectedProductIndex),
+                child: Text('Save'),
+                color: Theme.of(context).primaryColor,
+                textColor: Colors.white,
+              );
       },
     );
   }
@@ -144,15 +151,21 @@ class _ProductEditPageState extends State<ProductEditPage> {
       _formKey.currentState.save();
 
       if (selectedProductIndex == null) {
-        addProduct(_formData['title'], _formData['description'],
-            _formData['price'], _formData['image']);
+        addProduct(
+          _formData['title'],
+          _formData['description'],
+          _formData['price'],
+          _formData['image'],
+        ).then((_) => Navigator.pushReplacementNamed(context, '/products')
+            .then((_) => setSelectedProduct(null)));
       } else {
-        updateProduct(_formData['title'], _formData['description'],
-            _formData['price'], _formData['image']);
+        updateProduct(
+          _formData['title'],
+          _formData['description'],
+          _formData['price'],
+          _formData['image'],
+        );
       }
-
-      Navigator.pushReplacementNamed(context, '/products')
-          .then((_) => setSelectedProduct(null));
     }
   }
 

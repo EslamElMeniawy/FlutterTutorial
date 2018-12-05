@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
@@ -12,9 +13,10 @@ class ConnectedProductModel extends Model {
   int _selectedProductIndex;
   bool _isLoading = false;
 
-  void addProduct(
+  Future<Null> addProduct(
       String title, String description, double price, String image) {
     _isLoading = true;
+    notifyListeners();
 
     final Map<String, dynamic> productData = {
       'title': title,
@@ -26,7 +28,7 @@ class ConnectedProductModel extends Model {
       'userId': _authenticatedUser.id
     };
 
-    http
+    return http
         .post('https://auth-95faf.firebaseio.com/products.json',
             body: json.encode(productData))
         .then((http.Response response) {
@@ -102,6 +104,7 @@ class ProductsModel extends ConnectedProductModel {
 
   void fetchProducts() {
     _isLoading = true;
+    notifyListeners();
 
     http
         .get('https://auth-95faf.firebaseio.com/products.json')
@@ -109,6 +112,12 @@ class ProductsModel extends ConnectedProductModel {
       final List<Product> fetchedProductList = [];
 
       final Map<String, dynamic> productListData = json.decode(response.body);
+
+      if (productListData == null) {
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
 
       productListData.forEach((String productId, dynamic productData) {
         final Product product = Product(
