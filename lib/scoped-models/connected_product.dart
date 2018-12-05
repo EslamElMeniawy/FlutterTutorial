@@ -53,6 +53,10 @@ class ConnectedProductModel extends Model {
       _isLoading = false;
       notifyListeners();
       return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 }
@@ -97,7 +101,7 @@ class ProductsModel extends ConnectedProductModel {
     return _showFavorite;
   }
 
-  Future<Null> updateProduct(
+  Future<bool> updateProduct(
       String title, String description, double price, String image) {
     _isLoading = true;
     notifyListeners();
@@ -117,6 +121,12 @@ class ProductsModel extends ConnectedProductModel {
             'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}.json',
             body: json.encode(updatedData))
         .then((http.Response response) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
       final Product updatedProduct = Product(
           id: selectedProduct.id,
           title: title,
@@ -129,10 +139,15 @@ class ProductsModel extends ConnectedProductModel {
       _products[selectedProductIndex] = updatedProduct;
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
-  Future<Null> deleteProduct() {
+  Future<bool> deleteProduct() {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
 
@@ -144,8 +159,19 @@ class ProductsModel extends ConnectedProductModel {
         .delete(
             'https://auth-95faf.firebaseio.com/products/$deletedProductId.json')
         .then((http.Response response) {
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
@@ -155,7 +181,7 @@ class ProductsModel extends ConnectedProductModel {
 
     return http
         .get('https://auth-95faf.firebaseio.com/products.json')
-        .then((http.Response response) {
+        .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
 
       final Map<String, dynamic> productListData = json.decode(response.body);
@@ -183,6 +209,10 @@ class ProductsModel extends ConnectedProductModel {
       _isLoading = false;
       notifyListeners();
       _selectedProductId = null;
+    }).catchError((error) {
+      _isLoading = false;
+      notifyListeners();
+      return;
     });
   }
 

@@ -55,7 +55,28 @@ class _ProductListPageState extends State<ProductListPage> {
               onDismissed: (DismissDirection direction) {
                 if (direction == DismissDirection.endToStart) {
                   model.selectProduct(product.id);
-                  model.deleteProduct();
+                  model.deleteProduct().then((success) {
+                    if (!success) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Something went wrong'),
+                            content: Text('Please try again!'),
+                            actions: <Widget>[
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  model.fetchProducts();
+                                },
+                                child: Text('Okay'),
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  });
                 }
               },
               background: Container(
