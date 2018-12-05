@@ -3,6 +3,8 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../scoped-models/main.dart';
 
+enum AuthMode { SignUp, Login }
+
 class AuthPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -18,6 +20,8 @@ class _AuthPageState extends State<AuthPage> {
   };
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordTextController = TextEditingController();
+  AuthMode _authMode = AuthMode.Login;
 
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
@@ -57,6 +61,7 @@ class _AuthPageState extends State<AuthPage> {
         fillColor: Colors.white,
       ),
       obscureText: true,
+      controller: _passwordTextController,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
           return 'Password invalid';
@@ -64,6 +69,25 @@ class _AuthPageState extends State<AuthPage> {
       },
       onSaved: (String value) {
         _formData['password'] = value;
+      },
+    );
+  }
+
+  Widget _buildConfirmPasswordTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'Confirm Password',
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      obscureText: true,
+      validator: (String value) {
+        if (value != _passwordTextController.text) {
+          return 'Passwords do not match.';
+        }
+      },
+      onSaved: (String value) {
+        _formData['email'] = value;
       },
     );
   }
@@ -118,7 +142,32 @@ class _AuthPageState extends State<AuthPage> {
                       height: 10.0,
                     ),
                     _buildPasswordTextField(),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    _authMode == AuthMode.SignUp
+                        ? _buildConfirmPasswordTextField()
+                        : Container(),
+                    _authMode == AuthMode.SignUp
+                        ? SizedBox(
+                            height: 10.0,
+                          )
+                        : Container(),
                     _buildTermsSwitch(),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        setState(() {
+                          _authMode = _authMode == AuthMode.Login
+                              ? AuthMode.SignUp
+                              : AuthMode.Login;
+                        });
+                      },
+                      child: Text(
+                          'Switch to ${_authMode == AuthMode.Login ? 'SignUp' : 'Login'}'),
+                    ),
                     SizedBox(
                       height: 10.0,
                     ),
@@ -128,7 +177,8 @@ class _AuthPageState extends State<AuthPage> {
                         return RaisedButton(
                           color: Theme.of(context).primaryColor,
                           textColor: Colors.white,
-                          child: Text('LOGIN'),
+                          child: Text(
+                              _authMode == AuthMode.Login ? 'LOGIN' : 'SIGNUP'),
                           onPressed: () => _submitForm(model.login),
                         );
                       },
