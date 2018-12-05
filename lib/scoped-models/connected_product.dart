@@ -72,7 +72,7 @@ class ProductsModel extends ConnectedProductModel {
 
     try {
       final http.Response response = await http.post(
-          'https://auth-95faf.firebaseio.com/products.json',
+          'https://auth-95faf.firebaseio.com/products.json?auth=${_authenticatedUser.token}',
           body: json.encode(productData));
 
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -120,7 +120,7 @@ class ProductsModel extends ConnectedProductModel {
 
     return http
         .put(
-            'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}.json',
+            'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updatedData))
         .then((http.Response response) {
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -159,7 +159,7 @@ class ProductsModel extends ConnectedProductModel {
 
     return http
         .delete(
-            'https://auth-95faf.firebaseio.com/products/$deletedProductId.json')
+            'https://auth-95faf.firebaseio.com/products/$deletedProductId.json?auth=${_authenticatedUser.token}')
         .then((http.Response response) {
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isLoading = false;
@@ -182,7 +182,8 @@ class ProductsModel extends ConnectedProductModel {
     notifyListeners();
 
     return http
-        .get('https://auth-95faf.firebaseio.com/products.json')
+        .get(
+            'https://auth-95faf.firebaseio.com/products.json?auth=${_authenticatedUser.token}')
         .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
 
@@ -292,6 +293,12 @@ class UserModel extends ConnectedProductModel {
         } else {
           message = 'Something went wrong.';
         }
+      } else {
+        _authenticatedUser = User(
+          id: responseData['localId'],
+          email: responseData['email'],
+          token: responseData['idToken'],
+        );
       }
 
       _isLoading = false;
@@ -302,7 +309,6 @@ class UserModel extends ConnectedProductModel {
       notifyListeners();
       return {'success': false, 'message': 'Something went wrong.'};
     }
-    //_authenticatedUser = User(id: 'userid', email: email, password: password);
   }
 }
 
