@@ -14,7 +14,7 @@ class ConnectedProductModel extends Model {
   bool _isLoading = false;
 
   Future<bool> addProduct(
-      String title, String description, double price, String image) {
+      String title, String description, double price, String image) async {
     _isLoading = true;
     notifyListeners();
 
@@ -28,10 +28,11 @@ class ConnectedProductModel extends Model {
       'userId': _authenticatedUser.id
     };
 
-    return http
-        .post('https://auth-95faf.firebaseio.com/products.json',
-            body: json.encode(productData))
-        .then((http.Response response) {
+    try {
+      final http.Response response = await http.post(
+          'https://auth-95faf.firebaseio.com/products.json',
+          body: json.encode(productData));
+
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isLoading = false;
         notifyListeners();
@@ -53,11 +54,11 @@ class ConnectedProductModel extends Model {
       _isLoading = false;
       notifyListeners();
       return true;
-    }).catchError((error) {
+    } catch (error) {
       _isLoading = false;
       notifyListeners();
       return false;
-    });
+    }
   }
 }
 
