@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../scoped-models/main.dart';
-
-enum AuthMode { SignUp, Login }
+import '../models/auth.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -101,21 +100,14 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm(Function login, Function signUp) async {
+  void _submitForm(Function authenticate) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
 
     _formKey.currentState.save();
-    Map<String, dynamic> successInformation;
-
-    if (_authMode == AuthMode.Login) {
-      successInformation =
-          await login(_formData['email'], _formData['password']);
-    } else {
-      successInformation =
-          await signUp(_formData['email'], _formData['password']);
-    }
+    final Map<String, dynamic> successInformation = await authenticate(
+        _formData['email'], _formData['password'], _authMode);
 
     if (successInformation['success']) {
       Navigator.pushReplacementNamed(context, '/products');
@@ -207,7 +199,7 @@ class _AuthPageState extends State<AuthPage> {
                                     ? 'LOGIN'
                                     : 'SIGNUP'),
                                 onPressed: () =>
-                                    _submitForm(model.login, model.signUp),
+                                    _submitForm(model.authenticate),
                               );
                       },
                     ),
