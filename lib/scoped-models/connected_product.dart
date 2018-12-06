@@ -57,6 +57,10 @@ class ProductsModel extends ConnectedProductModel {
     return _showFavorite;
   }
 
+  void cleatProductsList() {
+    _products.clear();
+  }
+
   Future<bool> addProduct(
       String title, String description, double price, String image) async {
     _isLoading = true;
@@ -179,7 +183,7 @@ class ProductsModel extends ConnectedProductModel {
     });
   }
 
-  Future<Null> fetchProducts() {
+  Future<Null> fetchProducts({bool onlyForUser = false}) {
     _isLoading = true;
     notifyListeners();
 
@@ -214,7 +218,12 @@ class ProductsModel extends ConnectedProductModel {
         fetchedProductList.add(product);
       });
 
-      _products = fetchedProductList;
+      _products = onlyForUser
+          ? fetchedProductList.where((Product product) {
+              return product.userId == _authenticatedUser.id;
+            }).toList()
+          : fetchedProductList;
+
       _isLoading = false;
       notifyListeners();
       _selectedProductId = null;

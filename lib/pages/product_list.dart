@@ -19,7 +19,8 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
   @override
   initState() {
-    widget.model.fetchProducts();
+    widget.model.cleatProductsList();
+    widget.model.fetchProducts(onlyForUser: true);
     super.initState();
   }
 
@@ -46,59 +47,63 @@ class _ProductListPageState extends State<ProductListPage> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return ListView.builder(
-          itemBuilder: (BuildContext context, int index) {
-            final Product product = model.allProducts[index];
+        return model.isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView.builder(
+                itemBuilder: (BuildContext context, int index) {
+                  final Product product = model.allProducts[index];
 
-            return Dismissible(
-              key: Key(product.title),
-              onDismissed: (DismissDirection direction) {
-                if (direction == DismissDirection.endToStart) {
-                  model.selectProduct(product.id);
-                  model.deleteProduct().then((success) {
-                    if (!success) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Something went wrong'),
-                            content: Text('Please try again!'),
-                            actions: <Widget>[
-                              FlatButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  model.fetchProducts();
-                                },
-                                child: Text('Okay'),
-                              )
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  });
-                }
-              },
-              background: Container(
-                color: Colors.red,
-              ),
-              child: Column(
-                children: <Widget>[
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(product.image),
+                  return Dismissible(
+                    key: Key(product.title),
+                    onDismissed: (DismissDirection direction) {
+                      if (direction == DismissDirection.endToStart) {
+                        model.selectProduct(product.id);
+                        model.deleteProduct().then((success) {
+                          if (!success) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Something went wrong'),
+                                  content: Text('Please try again!'),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        model.fetchProducts();
+                                      },
+                                      child: Text('Okay'),
+                                    )
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        });
+                      }
+                    },
+                    background: Container(
+                      color: Colors.red,
                     ),
-                    title: Text(product.title),
-                    subtitle: Text('\$${product.price.toString()}'),
-                    trailing: _buildEditButton(context, index, model),
-                  ),
-                  Divider(),
-                ],
-              ),
-            );
-          },
-          itemCount: model.allProducts.length,
-        );
+                    child: Column(
+                      children: <Widget>[
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(product.image),
+                          ),
+                          title: Text(product.title),
+                          subtitle: Text('\$${product.price.toString()}'),
+                          trailing: _buildEditButton(context, index, model),
+                        ),
+                        Divider(),
+                      ],
+                    ),
+                  );
+                },
+                itemCount: model.allProducts.length,
+              );
       },
     );
   }
