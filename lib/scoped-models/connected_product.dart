@@ -221,7 +221,7 @@ class ProductsModel extends ConnectedProductModel {
     });
   }
 
-  void toggleProductFavoriteStatus() {
+  void toggleProductFavoriteStatus() async {
     final Product updatedProduct = Product(
         id: selectedProduct.id,
         title: selectedProduct.title,
@@ -234,6 +234,33 @@ class ProductsModel extends ConnectedProductModel {
 
     _products[selectedProductIndex] = updatedProduct;
     notifyListeners();
+    http.Response response;
+
+    if (selectedProduct.isFavorite) {
+      response = await http.put(
+        'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+        body: json.encode(true),
+      );
+    } else {
+      response = await http.delete(
+        'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+      );
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final Product updatedProduct = Product(
+          id: selectedProduct.id,
+          title: selectedProduct.title,
+          description: selectedProduct.description,
+          price: selectedProduct.price,
+          image: selectedProduct.image,
+          userEmail: selectedProduct.userEmail,
+          userId: selectedProduct.userId,
+          isFavorite: !selectedProduct.isFavorite);
+
+      _products[selectedProductIndex] = updatedProduct;
+      notifyListeners();
+    }
   }
 
   void selectProduct(String productId) {
