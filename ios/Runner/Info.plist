@@ -28,6 +28,12 @@
 	<string>Main</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>User location is required for adding product location.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Image used as a product image.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Image used as a product image.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Record product video.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

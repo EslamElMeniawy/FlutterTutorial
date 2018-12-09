@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 import '../models/product.dart';
 import '../models/user.dart';
@@ -61,19 +64,70 @@ class ProductsModel extends ConnectedProductModel {
     _products.clear();
   }
 
+  Future<Map<String, dynamic>> uploadImage(File image,
+      {String imagePath}) async {
+    final mimeTypeData = lookupMimeType(image.path).split('/');
+
+    final imageUploadRequest = http.MultipartRequest(
+      'POST',
+      Uri.parse('https://us-central1-auth-95faf.cloudfunctions.net/storeImage'),
+    );
+
+    final file = await http.MultipartFile.fromPath(
+      'image',
+      image.path,
+      contentType: MediaType(
+        mimeTypeData[0],
+        mimeTypeData[1],
+      ),
+    );
+
+    imageUploadRequest.files.add(file);
+
+    if (imagePath != null) {
+      imageUploadRequest.fields['imagePath'] = Uri.encodeComponent(imagePath);
+    }
+
+    imageUploadRequest.headers['Authorization'] =
+        'Bearer ${_authenticatedUser.token}';
+
+    try {
+      final streamedResponse = await imageUploadRequest.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        print('Something went wrong');
+        print(json.decode(response.body));
+        return null;
+      }
+
+      final responseData = json.decode(response.body);
+      return responseData;
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+
   Future<bool> addProduct(
-      String title, String description, double price, String image) async {
+      String title, String description, double price, File image) async {
     _isLoading = true;
     notifyListeners();
+    final uploadData = await uploadImage(image);
+
+    if (uploadData == null) {
+      print('Upload failed!');
+      return false;
+    }
 
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
       'price': price,
-      'image':
-          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
       'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
+      'userId': _authenticatedUser.id,
+      'imagePath': uploadData['imagePath'],
+      'imageUrl': uploadData['imageUrl']
     };
 
     try {
@@ -94,7 +148,8 @@ class ProductsModel extends ConnectedProductModel {
           title: title,
           description: description,
           price: price,
-          image: image,
+          image: uploadData['imageUrl'],
+          imagePath: uploadData['imagePath'],
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id);
 
@@ -110,25 +165,39 @@ class ProductsModel extends ConnectedProductModel {
   }
 
   Future<bool> updateProduct(
-      String title, String description, double price, String image) {
+      String title, String description, double price, File image) async {
     _isLoading = true;
     notifyListeners();
+    String imageUrl = selectedProduct.image;
+    String imagePath = selectedProduct.imagePath;
+
+    if (image != null) {
+      final uploadData = await uploadImage(image);
+
+      if (uploadData == null) {
+        print('Upload failed!');
+        return false;
+      }
+
+      imageUrl = uploadData['imageUrl'];
+      imagePath = uploadData['imagePath'];
+    }
 
     final Map<String, dynamic> updatedData = {
       'title': title,
       'description': description,
       'price': price,
-      'image':
-          'https://keyassets-p2.timeincuk.net/wp/prod/wp-content/uploads/sites/53/2018/04/pick-and-mix-chocolate-and-sweet-cake-920x605.jpg',
+      'imageUrl': imageUrl,
+      'imagePath': imagePath,
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id
     };
 
-    return http
-        .put(
-            'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
-            body: json.encode(updatedData))
-        .then((http.Response response) {
+    try {
+      final http.Response response = await http.put(
+          'https://auth-95faf.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
+          body: json.encode(updatedData));
+
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isLoading = false;
         notifyListeners();
@@ -140,7 +209,8 @@ class ProductsModel extends ConnectedProductModel {
           title: title,
           description: description,
           price: price,
-          image: image,
+          image: imageUrl,
+          imagePath: imagePath,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId);
 
@@ -148,11 +218,11 @@ class ProductsModel extends ConnectedProductModel {
       _isLoading = false;
       notifyListeners();
       return true;
-    }).catchError((error) {
+    } catch (error) {
       _isLoading = false;
       notifyListeners();
       return false;
-    });
+    }
   }
 
   Future<bool> deleteProduct() {
@@ -207,7 +277,8 @@ class ProductsModel extends ConnectedProductModel {
           title: productData['title'],
           description: productData['description'],
           price: productData['price'],
-          image: productData['image'],
+          image: productData['imageUrl'],
+          imagePath: productData['imagePath'],
           userEmail: productData['userEmail'],
           userId: productData['userId'],
           isFavorite: productData['wishlistUsers'] != null &&
@@ -241,6 +312,7 @@ class ProductsModel extends ConnectedProductModel {
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        imagePath: selectedProduct.imagePath,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
         isFavorite: !selectedProduct.isFavorite);
@@ -267,6 +339,7 @@ class ProductsModel extends ConnectedProductModel {
           description: selectedProduct.description,
           price: selectedProduct.price,
           image: selectedProduct.image,
+          imagePath: selectedProduct.imagePath,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId,
           isFavorite: !selectedProduct.isFavorite);

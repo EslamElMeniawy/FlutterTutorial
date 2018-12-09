@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/helpers/ensure_visible.dart';
-//import '../widgets/form_inputs/location.dart';
+import '../widgets/form_inputs/location.dart';
+import '../widgets/form_inputs/image.dart';
 import '../models/product.dart';
 import '../scoped-models/main.dart';
 
@@ -18,15 +21,30 @@ class _ProductEditPageState extends State<ProductEditPage> {
     'title': null,
     'description': null,
     'price': null,
-    'image': 'assets/food.jpg'
+    'image': null,
+    'location': null
   };
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _titleFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
   final _priceFocusNode = FocusNode();
+  final _titleTextController = TextEditingController();
+  final _descriptionTextController = TextEditingController();
 
   Widget _buildTitleTextField(Product product) {
+    if (product == null && _titleTextController.text.trim() == '') {
+      _titleTextController.text = '';
+    } else if (product != null && _titleTextController.text.trim() == '') {
+      _titleTextController.text = product.title;
+    } else if (product != null && _titleTextController.text.trim() != '') {
+      _titleTextController.text = _titleTextController.text;
+    } else if (product == null && _titleTextController.text.trim() != '') {
+      _titleTextController.text = _titleTextController.text;
+    } else {
+      _titleTextController.text = '';
+    }
+
     return EnsureVisibleWhenFocused(
       focusNode: _titleFocusNode,
       child: TextFormField(
@@ -34,6 +52,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         decoration: InputDecoration(
           labelText: 'Product Title',
         ),
+        controller: _titleTextController,
         initialValue: product == null ? '' : product.title,
         validator: (String value) {
           if (value.isEmpty || value.length < 5) {
@@ -48,6 +67,13 @@ class _ProductEditPageState extends State<ProductEditPage> {
   }
 
   Widget _buildDescriptionTextField(Product product) {
+    if (product == null && _descriptionTextController.text.trim() == '') {
+      _descriptionTextController.text = '';
+    } else if (product != null &&
+        _descriptionTextController.text.trim() == '') {
+      _descriptionTextController.text = product.description;
+    }
+
     return EnsureVisibleWhenFocused(
       focusNode: _descriptionFocusNode,
       child: TextFormField(
@@ -57,7 +83,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         decoration: InputDecoration(
           labelText: 'Product Description',
         ),
-        initialValue: product == null ? '' : product.description,
+        controller: _descriptionTextController,
         validator: (String value) {
           if (value.isEmpty || value.length < 10) {
             return 'Description is required and should be 10+ charachters long.';
@@ -136,7 +162,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
               SizedBox(
                 height: 10.0,
               ),
-//              LocationInput(),
+              LocationInput(_setLocation, product),
+              SizedBox(
+                height: 10.0,
+              ),
+              ImageInput(_setImage, product),
               SizedBox(
                 height: 10.0,
               ),
@@ -148,69 +178,80 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
+  void _setLocation(String location) {
+    _formData['location'] = location;
+  }
+
+  void _setImage(File image) {
+    _formData['image'] = image;
+  }
+
   void _submitForm(
       Function addProduct, Function updateProduct, Function setSelectedProduct,
       [String selectedProductId]) {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
+    if (!_formKey.currentState.validate() ||
+        (_formData['image'] == null && selectedProductId == null)) {
+      return;
+    }
 
-      if (selectedProductId == null) {
-        addProduct(
-          _formData['title'],
-          _formData['description'],
-          _formData['price'],
-          _formData['image'],
-        ).then((bool success) {
-          if (success) {
-            Navigator.pushReplacementNamed(context, '/')
-                .then((_) => setSelectedProduct(null));
-          } else {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Something went wrong'),
-                  content: Text('Please try again!'),
-                  actions: <Widget>[
-                    FlatButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Okay'),
-                    )
-                  ],
-                );
-              },
-            );
-          }
-        });
-      } else {
-        updateProduct(
-          _formData['title'],
-          _formData['description'],
-          _formData['price'],
-          _formData['image'],
-        ).then((bool success) {
-          if (success) {
-            Navigator.pushReplacementNamed(context, '/')
-                .then((_) => setSelectedProduct(null));
-          } else {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Something went wrong'),
-                  content: Text('Please try again!'),
-                  actions: <Widget>[
-                    FlatButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text('Okay'),
-                    )
-                  ],
-                );
-              },
-            );
-          }
-        });
-      }
+    _formKey.currentState.save();
+
+    if (selectedProductId == null) {
+      addProduct(
+        _titleTextController.text,
+        _descriptionTextController.text,
+        _formData['price'],
+        _formData['image'],
+      ).then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/')
+              .then((_) => setSelectedProduct(null));
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Something went wrong'),
+                content: Text('Please try again!'),
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('Okay'),
+                  )
+                ],
+              );
+            },
+          );
+        }
+      });
+    } else {
+      updateProduct(
+        _titleTextController.text,
+        _descriptionTextController.text,
+        _formData['price'],
+        _formData['image'],
+      ).then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/')
+              .then((_) => setSelectedProduct(null));
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Something went wrong'),
+                content: Text('Please try again!'),
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('Okay'),
+                  )
+                ],
+              );
+            },
+          );
+        }
+      });
     }
   }
 
