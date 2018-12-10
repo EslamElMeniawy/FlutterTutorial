@@ -83,7 +83,7 @@ class _ImageInputState extends State<ImageInput> {
       );
     } else if (widget.product != null) {
       previewImage = Image.network(
-        widget.product.imagePath,
+        widget.product.image,
         fit: BoxFit.cover,
         width: MediaQuery.of(context).size.width,
         height: 300.0,

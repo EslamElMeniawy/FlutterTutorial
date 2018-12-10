@@ -53,7 +53,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
           labelText: 'Product Title',
         ),
         controller: _titleTextController,
-        initialValue: product == null ? '' : product.title,
         validator: (String value) {
           if (value.isEmpty || value.length < 5) {
             return 'Title is required and should be 5+ charachters long.';
@@ -178,8 +177,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
-  void _setLocation(String location) {
-    _formData['location'] = location;
+  void _setLocation(String locData) {
+    _formData['location'] = locData;
   }
 
   void _setImage(File image) {
