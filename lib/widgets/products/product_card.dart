@@ -84,6 +84,9 @@ class ProductCard extends StatelessWidget {
             ),
           ),
           _buildTitlePriceRow(),
+          SizedBox(
+            height: 10.0,
+          ),
           AddressTag('Mansoura, Egypt'),
           _buildActionButtons(context),
         ],
