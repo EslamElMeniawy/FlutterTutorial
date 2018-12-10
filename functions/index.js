@@ -99,7 +99,22 @@ exports.storeImage = functions.https.onRequest((req, res) => {
 });
 
 exports.deleteImage = functions.database.ref('/products/{productId}').onDelete(snapshot => {
+    if (!snapshot.exists()) {
+        return null;
+    }
+
     const imageData = snapshot.val();
+    const imagePath = imageData.imagePath;
+    const bucket = gcs.bucket('auth-95faf.appspot.com');
+    return bucket.file(imagePath).delete();
+});
+
+exports.deleteOldImage = functions.database.ref('/products/{productId}').onUpdate(snapshot => {
+    if (!snapshot.before.exists()) {
+        return null;
+    }
+
+    const imageData = snapshot.before.val();
     const imagePath = imageData.imagePath;
     const bucket = gcs.bucket('auth-95faf.appspot.com');
     return bucket.file(imagePath).delete();
