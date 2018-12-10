@@ -114,8 +114,14 @@ exports.deleteOldImage = functions.database.ref('/products/{productId}').onUpdat
         return null;
     }
 
-    const imageData = snapshot.before.val();
-    const imagePath = imageData.imagePath;
+    const oldImageData = snapshot.before.val();
+    const imagePath = oldImageData.imagePath;
+    const imageData = snapshot.val();
+
+    if (imagePath == imageData.imagePath) {
+        return null;
+    }
+
     const bucket = gcs.bucket('auth-95faf.appspot.com');
     return bucket.file(imagePath).delete();
 });
