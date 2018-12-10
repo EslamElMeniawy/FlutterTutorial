@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../helpers/ensure_visible.dart';
 import '../../models/product.dart';
+//import '../../shared/global_config.dart';
 
 class LocationInput extends StatefulWidget {
   final Function setLocation;
@@ -35,7 +36,7 @@ class _LocationInputState extends State<LocationInput> {
 
 //  void getStaticMap() {
 //    final StaticMapProvider staticMapProvider =
-//        StaticMapProvider('AIzaSyC32f23cFNZdju2oIYFwRbwwyJxeqMGUZY');
+//        StaticMapProvider(apiKey);
 //
 //    final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
 //      [
