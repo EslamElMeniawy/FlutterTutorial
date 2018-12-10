@@ -57,11 +57,14 @@ class ProductPage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                FadeInImage(
-                  placeholder: AssetImage('assets/food.jpg'),
-                  image: NetworkImage(product.image),
-                  height: 300.0,
-                  fit: BoxFit.cover,
+                Hero(
+                  tag: product.id,
+                  child: FadeInImage(
+                    placeholder: AssetImage('assets/food.jpg'),
+                    image: NetworkImage(product.image),
+                    height: 300.0,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 Container(
                   padding: EdgeInsets.all(10.0),
