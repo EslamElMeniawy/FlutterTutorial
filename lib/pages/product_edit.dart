@@ -8,6 +8,7 @@ import '../widgets/form_inputs/location.dart';
 import '../widgets/form_inputs/image.dart';
 import '../widgets/ui_elements/adaptive_progress_indicator.dart';
 import '../models/product.dart';
+import '../models/location_data.dart';
 import '../scoped-models/main.dart';
 
 class ProductEditPage extends StatefulWidget {
@@ -182,7 +183,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     );
   }
 
-  void _setLocation(String locData) {
+  void _setLocation(LocationData locData) {
     _formData['location'] = locData;
   }
 
@@ -206,6 +207,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         _descriptionTextController.text,
         double.parse(_priceTextController.text.replaceFirst(RegExp(r','), '.')),
         _formData['image'],
+        _formData['location'],
       ).then((bool success) {
         if (success) {
           Navigator.pushReplacementNamed(context, '/')

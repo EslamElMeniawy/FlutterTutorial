@@ -12,6 +12,7 @@ import 'package:http_parser/http_parser.dart';
 import '../models/product.dart';
 import '../models/user.dart';
 import '../models/auth.dart';
+import '../models/location_data.dart';
 
 class ConnectedProductModel extends Model {
   List<Product> _products = [];
@@ -109,8 +110,8 @@ class ProductsModel extends ConnectedProductModel {
     }
   }
 
-  Future<bool> addProduct(
-      String title, String description, double price, File image) async {
+  Future<bool> addProduct(String title, String description, double price,
+      File image, LocationData locData) async {
     _isLoading = true;
     notifyListeners();
     final uploadData = await uploadImage(image);
@@ -127,7 +128,10 @@ class ProductsModel extends ConnectedProductModel {
       'userEmail': _authenticatedUser.email,
       'userId': _authenticatedUser.id,
       'imagePath': uploadData['imagePath'],
-      'imageUrl': uploadData['imageUrl']
+      'imageUrl': uploadData['imageUrl'],
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address
     };
 
     try {
