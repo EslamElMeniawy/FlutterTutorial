@@ -148,14 +148,16 @@ class ProductsModel extends ConnectedProductModel {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       final Product newProduct = Product(
-          id: responseData['name'],
-          title: title,
-          description: description,
-          price: price,
-          image: uploadData['imageUrl'],
-          imagePath: uploadData['imagePath'],
-          userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id);
+        id: responseData['name'],
+        title: title,
+        description: description,
+        price: price,
+        image: uploadData['imageUrl'],
+        imagePath: uploadData['imagePath'],
+        userEmail: _authenticatedUser.email,
+        userId: _authenticatedUser.id,
+        location: locData,
+      );
 
       _products.add(newProduct);
       _isLoading = false;
@@ -168,8 +170,8 @@ class ProductsModel extends ConnectedProductModel {
     }
   }
 
-  Future<bool> updateProduct(
-      String title, String description, double price, File image) async {
+  Future<bool> updateProduct(String title, String description, double price,
+      File image, LocationData locData) async {
     _isLoading = true;
     notifyListeners();
     String imageUrl = selectedProduct.image;
@@ -194,7 +196,10 @@ class ProductsModel extends ConnectedProductModel {
       'imageUrl': imageUrl,
       'imagePath': imagePath,
       'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
+      'userId': _authenticatedUser.id,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address
     };
 
     try {
@@ -209,14 +214,16 @@ class ProductsModel extends ConnectedProductModel {
       }
 
       final Product updatedProduct = Product(
-          id: selectedProduct.id,
-          title: title,
-          description: description,
-          price: price,
-          image: imageUrl,
-          imagePath: imagePath,
-          userEmail: selectedProduct.userEmail,
-          userId: selectedProduct.userId);
+        id: selectedProduct.id,
+        title: title,
+        description: description,
+        price: price,
+        image: imageUrl,
+        imagePath: imagePath,
+        userEmail: selectedProduct.userEmail,
+        userId: selectedProduct.userId,
+        location: locData,
+      );
 
       _products[selectedProductIndex] = updatedProduct;
       _isLoading = false;
@@ -285,6 +292,11 @@ class ProductsModel extends ConnectedProductModel {
           imagePath: productData['imagePath'],
           userEmail: productData['userEmail'],
           userId: productData['userId'],
+          location: LocationData(
+            latitude: productData['loc_lat'],
+            longitude: productData['loc_lng'],
+            address: productData['loc_address'],
+          ),
           isFavorite: productData['wishlistUsers'] != null &&
               (productData['wishlistUsers'] as Map<String, dynamic>)
                   .containsKey(_authenticatedUser.id),
@@ -319,6 +331,7 @@ class ProductsModel extends ConnectedProductModel {
         imagePath: selectedProduct.imagePath,
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
+        location: selectedProduct.location,
         isFavorite: !selectedProduct.isFavorite);
 
     _products[selectedProductIndex] = updatedProduct;
@@ -346,6 +359,7 @@ class ProductsModel extends ConnectedProductModel {
           imagePath: selectedProduct.imagePath,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId,
+          location: selectedProduct.location,
           isFavorite: !selectedProduct.isFavorite);
 
       _products[selectedProductIndex] = updatedProduct;

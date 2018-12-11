@@ -236,6 +236,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         _descriptionTextController.text,
         double.parse(_priceTextController.text.replaceFirst(RegExp(r','), '.')),
         _formData['image'],
+        _formData['location'],
       ).then((bool success) {
         if (success) {
           Navigator.pushReplacementNamed(context, '/')
