@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-//import 'package:map_view/map_view.dart';
+import 'package:map_view/map_view.dart';
 
 import '../helpers/ensure_visible.dart';
 import '../../models/product.dart';
-//import '../../shared/global_config.dart';
+import '../../shared/global_config.dart';
 
 class LocationInput extends StatefulWidget {
   final Function setLocation;
@@ -24,7 +24,7 @@ class _LocationInputState extends State<LocationInput> {
   @override
   void initState() {
     _addressInputFocusNode.addListener(_updateLocation);
-//    getStaticMap();
+    getStaticMap();
     super.initState();
   }
 
@@ -34,24 +34,24 @@ class _LocationInputState extends State<LocationInput> {
     super.dispose();
   }
 
-//  void getStaticMap() {
-//    final StaticMapProvider staticMapProvider =
-//        StaticMapProvider(apiKey);
-//
-//    final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
-//      [
-//        Marker('position', 'Position', 41.40338, 2.17403),
-//      ],
-//      center: Location(41.40338, 2.17403),
-//      width: 500,
-//      height: 300,
-//      maptype: StaticMapViewType.roadmap,
-//    );
-//
-//    setState(() {
-//      _staticMapUri = staticMapUri;
-//    });
-//  }
+  void getStaticMap() {
+    final StaticMapProvider staticMapProvider =
+        StaticMapProvider(apiKey);
+
+    final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
+      [
+        Marker('position', 'Position', 41.40338, 2.17403),
+      ],
+      center: Location(41.40338, 2.17403),
+      width: 500,
+      height: 300,
+      maptype: StaticMapViewType.roadmap,
+    );
+
+    setState(() {
+      _staticMapUri = staticMapUri;
+    });
+  }
 
   void _updateLocation() {}
 
