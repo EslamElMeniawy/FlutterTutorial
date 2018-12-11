@@ -60,41 +60,51 @@ class _LocationInputState extends State<LocationInput> {
 
     final http.Response response = await http.get(uri);
     final decodedResponse = json.decode(response.body);
-    final formattedAddress = decodedResponse['results'][0]['formatted_address'];
-    final coords = decodedResponse['results'][0]['geometry']['location'];
+    if ((decodedResponse['results'] as List).isNotEmpty) {
+      final formattedAddress =
+          decodedResponse['results'][0]['formatted_address'];
 
-    _locationData = LocationData(
-      latitude: coords['lat'],
-      longitude: coords['lng'],
-      address: formattedAddress,
-    );
+      final coords = decodedResponse['results'][0]['geometry']['location'];
 
-    final StaticMapProvider staticMapProvider = StaticMapProvider(apiKey);
+      _locationData = LocationData(
+        latitude: coords['lat'],
+        longitude: coords['lng'],
+        address: formattedAddress,
+      );
 
-    final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
-      [
-        Marker(
-          'position',
-          'Position',
+      final StaticMapProvider staticMapProvider = StaticMapProvider(apiKey);
+
+      final Uri staticMapUri = staticMapProvider.getStaticUriWithMarkers(
+        [
+          Marker(
+            'position',
+            'Position',
+            _locationData.latitude,
+            _locationData.longitude,
+          ),
+        ],
+        center: Location(
           _locationData.latitude,
           _locationData.longitude,
         ),
-      ],
-      center: Location(
-        _locationData.latitude,
-        _locationData.longitude,
-      ),
-      width: 500,
-      height: 300,
-      maptype: StaticMapViewType.roadmap,
-    );
+        width: 500,
+        height: 300,
+        maptype: StaticMapViewType.roadmap,
+      );
 
-    widget.setLocation(_locationData);
+      widget.setLocation(_locationData);
 
-    setState(() {
-      _addressInputController.text = _locationData.address;
-      _staticMapUri = staticMapUri;
-    });
+      setState(() {
+        _addressInputController.text = _locationData.address;
+        _staticMapUri = staticMapUri;
+      });
+    } else {
+      setState(() {
+        _staticMapUri = null;
+      });
+
+      widget.setLocation(null);
+    }
   }
 
   void _updateLocation() {
@@ -123,7 +133,9 @@ class _LocationInputState extends State<LocationInput> {
         SizedBox(
           height: 10.0,
         ),
-        Image.network(_staticMapUri.toString()),
+        _staticMapUri != null
+            ? Image.network(_staticMapUri.toString())
+            : Container(),
       ],
     );
   }

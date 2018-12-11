@@ -20,15 +20,33 @@ class ImageInput extends StatefulWidget {
 class _ImageInputState extends State<ImageInput> {
   File _imageFile;
 
-  void _getImage(BuildContext context, ImageSource source) {
-    ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
+  void _getImage(BuildContext context, ImageSource source) async {
+    try {
+      File image = await ImagePicker.pickImage(source: source, maxWidth: 400.0);
+
       setState(() {
         _imageFile = image;
       });
 
       widget.setImage(image);
       Navigator.pop(context);
-    });
+    } catch (error) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Cannot pick this image!'),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Okay'),
+              )
+            ],
+          );
+        },
+      );
+    }
   }
 
   void _openImagePicker(BuildContext context) {
