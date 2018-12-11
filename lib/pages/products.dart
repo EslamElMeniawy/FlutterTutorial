@@ -4,6 +4,7 @@ import 'package:scoped_model/scoped_model.dart';
 import '../widgets/products/products.dart';
 import '../scoped-models/main.dart';
 import '../widgets/ui_elements/logout_list_tile.dart';
+import '../widgets/ui_elements/adaptive_progress_indicator.dart';
 
 class ProductsPage extends StatefulWidget {
   final MainModel model;
@@ -30,6 +31,8 @@ class _ProductPageState extends State<ProductsPage> {
           AppBar(
             automaticallyImplyLeading: false,
             title: Text('Choose'),
+            elevation:
+                Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
           ),
           ListTile(
             leading: Icon(Icons.edit),
@@ -56,7 +59,7 @@ class _ProductPageState extends State<ProductsPage> {
           content = Products();
         } else if (model.isLoading) {
           content = Center(
-            child: CircularProgressIndicator(),
+            child: AdaptiveProgressIndicator(),
           );
         }
 
@@ -75,6 +78,7 @@ class _ProductPageState extends State<ProductsPage> {
       appBar: AppBar(
         title: Text('Easy List'),
         centerTitle: true,
+        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         actions: <Widget>[
           ScopedModelDescendant<MainModel>(
             builder: (BuildContext context, Widget child, MainModel model) {

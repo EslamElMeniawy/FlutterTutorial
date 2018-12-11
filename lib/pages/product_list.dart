@@ -4,6 +4,7 @@ import 'package:scoped_model/scoped_model.dart';
 import './product_edit.dart';
 import '../models/product.dart';
 import '../scoped-models/main.dart';
+import '../widgets/ui_elements/adaptive_progress_indicator.dart';
 
 class ProductListPage extends StatefulWidget {
   final MainModel model;
@@ -49,7 +50,7 @@ class _ProductListPageState extends State<ProductListPage> {
       builder: (BuildContext context, Widget child, MainModel model) {
         return model.isLoading
             ? Center(
-                child: CircularProgressIndicator(),
+                child: AdaptiveProgressIndicator(),
               )
             : ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
