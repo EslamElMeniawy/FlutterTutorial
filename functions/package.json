@@ -14,7 +14,7 @@
     "@google-cloud/storage": "^7.19.0",
     "busboy": "^0.2.14",
     "cors": "^2.8.4",
-    "uuid": "^3.2.1"
+    "uuid": "^14.0.0"
   },
   "private": true
 }
